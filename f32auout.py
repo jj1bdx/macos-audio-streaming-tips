@@ -43,7 +43,7 @@ stream = p.open(format = pyaudio.paFloat32,
                 rate = sample_rate,
                 output = True,
                 output_device_index = devidx,
-                frames_per_buffer = 48,
+                frames_per_buffer = 240, # 5msec
                 stream_callback = callback)
 
 stream.start_stream()
