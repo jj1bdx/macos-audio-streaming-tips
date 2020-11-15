@@ -21,7 +21,7 @@ channels = int(argvs[1])
 sample_rate = 11025
 sample_width = 2 # 16bit integer
 sample_format = pyaudio.paInt16
-framesize = 550 # 50msec
+framesize = 110 # 10msec
 
 if sys.platform == 'darwin':
     CHANNELS = 1
