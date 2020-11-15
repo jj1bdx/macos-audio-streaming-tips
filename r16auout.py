@@ -19,7 +19,7 @@ else:
   quit()
 channels = int(argvs[1])
 sample_rate = 48000
-sample_width = 4 # 32bit float
+sample_width = 2 # 16bit int
 
 def terminate():
     stream.stop_stream()
@@ -32,12 +32,12 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-framesize = 480 # 10msec
+framesize = 1024 # 10msec
 readsize = framesize * sample_width * channels
 
 p = pyaudio.PyAudio()
 
-stream = p.open(format = pyaudio.paFloat32,
+stream = p.open(format = pyaudio.paInt16,
                 channels = channels,
                 rate = sample_rate,
                 output = True,

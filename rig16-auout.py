@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Pyaudio output device for 32-bit floating audio input from stdin
+# Pyaudio output device for 16-bit signed-integer audio input from stdin
 import pyaudio
 import signal
 import sys
@@ -18,8 +18,8 @@ else:
   print('Usage: ', argvs[0], 'channels [device-index]\n')
   quit()
 channels = int(argvs[1])
-sample_rate = 48000
-sample_width = 4 # 32bit float
+sample_rate = 11025 
+sample_width = 2 # 16bit integer
 
 def terminate():
     stream.stop_stream()
@@ -32,22 +32,23 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-framesize = 480 # 10msec
-readsize = framesize * sample_width * channels
+def callback(in_data, frame_count, time_info, status):
+    data = sys.stdin.buffer.read(frame_count * sample_width * channels)
+    return (data, pyaudio.paContinue)
 
 p = pyaudio.PyAudio()
 
-stream = p.open(format = pyaudio.paFloat32,
+stream = p.open(format = pyaudio.paInt16,
                 channels = channels,
                 rate = sample_rate,
                 output = True,
                 output_device_index = devidx,
-                frames_per_buffer = framesize
-                )
+                frames_per_buffer = 110, # 10msec
+                stream_callback = callback)
 
-data = sys.stdin.buffer.read(readsize)
-while data != '':
-    stream.write(data)
-    data = sys.stdin.buffer.read(readsize)
+stream.start_stream()
+
+while stream.is_active():
+    time.sleep(0.1)
 
 terminate()

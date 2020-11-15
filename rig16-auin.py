@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Pyaudio output device for 32-bit floating audio input from stdin
 import pyaudio
 import signal
 import sys
@@ -17,9 +16,15 @@ elif argc == 3:
 else:
   print('Usage: ', argvs[0], 'channels [device-index]\n')
   quit()
+
 channels = int(argvs[1])
-sample_rate = 48000
-sample_width = 4 # 32bit float
+sample_rate = 11025
+sample_width = 2 # 16bit integer
+sample_format = pyaudio.paInt16
+framesize = 550 # 50msec
+
+if sys.platform == 'darwin':
+    CHANNELS = 1
 
 def terminate():
     stream.stop_stream()
@@ -32,22 +37,23 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-framesize = 480 # 10msec
-readsize = framesize * sample_width * channels
+def callback(in_data, frame_count, time_info, status):
+    sys.stdout.buffer.write(in_data)
+    return (None, pyaudio.paContinue)
 
 p = pyaudio.PyAudio()
 
-stream = p.open(format = pyaudio.paFloat32,
+stream = p.open(format = sample_format,
                 channels = channels,
                 rate = sample_rate,
-                output = True,
-                output_device_index = devidx,
-                frames_per_buffer = framesize
-                )
+                input = True,
+                input_device_index = devidx,
+                frames_per_buffer = framesize,
+                stream_callback = callback)
 
-data = sys.stdin.buffer.read(readsize)
-while data != '':
-    stream.write(data)
-    data = sys.stdin.buffer.read(readsize)
+stream.start_stream()
+
+while stream.is_active():
+    time.sleep(0.1)
 
 terminate()
