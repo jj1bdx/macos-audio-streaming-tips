@@ -6,6 +6,7 @@
 * Still unable to find an option to shorten the audio latency
 * Sender Linux: Raspberry Pi 4B with Raspberry Pi OS
 * Receiver macOS: macOS 10.15.7
+* ffplay does not recognize non-native RTP payload types. See [Wikipedia RTP Payload Type list](https://en.wikipedia.org/wiki/RTP_payload_formats) for the native format types.
 
 ### 48kHz 256kbps MP3 stereo RTP
 
