@@ -24,6 +24,7 @@ sudo launchctl kickstart -kp system/com.apple.audio.coreaudiod
   - No problem for gstreamer input/output
   - Able to instantly create/delete loopback devices with arbitrary names
   - Able to monitor loopback devices separately for each device
+  - Able to control the loopback device sound volume for each device, useful for WSJT-X reception gain control
 
 ## Free software
 

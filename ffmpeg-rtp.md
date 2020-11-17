@@ -1,14 +1,14 @@
-## ffmpeg streaming examples
+# ffmpeg streaming examples
 
-### Note
+## Note
 
 * Audio latency measured via ethernet: ~700msec
-* Still unable to find an option to shorten the audio latency
+* *Still unable to find an option to shorten the audio latency*
 * Sender Linux: Raspberry Pi 4B with Raspberry Pi OS
 * Receiver macOS: macOS 10.15.7
 * ffplay does not recognize non-native RTP payload types. See [Wikipedia RTP Payload Type list](https://en.wikipedia.org/wiki/RTP_payload_formats) for the native format types.
 
-### 48kHz 256kbps MP3 stereo RTP
+## 48kHz 256kbps MP3 stereo RTP
 
 ```shell
 # sender Linux
@@ -20,7 +20,7 @@ arecord --buffer-time=10000 -D plughw:CARD=CODEC,DEV=0 -f S16_LE -c2 -r48000 | f
 ffmpeg -probesize 32 -fflags nobuffer -fflags discardcorrupt -flags low_delay -avioflags direct -i rtp://receiver:34567 -f s16le - | r16auout.py 2
 ```
 
-### 44.1kHz linear PCM mono RTP
+## 44.1kHz linear PCM mono RTP
 
 ```shell
 # sender Linux
@@ -32,7 +32,7 @@ arecord --buffer-time=10000 -D plughw:CARD=CODEC,DEV=0 -f S16_LE -c1 -r44100 | f
 ffmpeg -probesize 32 -fflags nobuffer -fflags discardcorrupt -flags low_delay -avioflags direct -i rtp://receiver:34567 -f s16le - | r16-44100-auout.py 1
 ```
 
-### 16kHz g.722 mono RTP
+## 16kHz g.722 mono RTP
 
 ```shell
 # sender Linux
@@ -44,7 +44,7 @@ arecord --buffer-time=10000 -D plughw:CARD=CODEC,DEV=0 -f S16_LE -c1 -r16000 | f
 ffplay -probesize 32 -fflags nobuffer -fflags discardcorrupt -flags low_delay -avioflags direct -i rtp://receiver:34567
 ```
 
-### 16kHz g.722 mono with RTSP SDP TCP transport
+## 16kHz g.722 mono with RTSP SDP TCP transport
 
 ```shell
 # sender Linux
@@ -56,7 +56,7 @@ arecord --buffer-time=10000 -D plughw:CARD=CODEC,DEV=0 -f S16_LE -c1 -r16000 | f
 ffplay -nodisp -probesize 32 -fflags nobuffer -fflags discardcorrupt -flags low_delay -avioflags direct -rtsp_flags listen "rtsp://receiver:45678/live.sdp"
 ```
 
-### 44.1kHz linear PCM stereo with RTSP SDP TCP transport
+## 44.1kHz linear PCM stereo with RTSP SDP TCP transport
 
 ```shell
 # sender Linux
@@ -68,7 +68,7 @@ arecord --buffer-time=20000 -D plughw:CARD=CODEC,DEV=0 -f S16_LE -c2 -r44100 | f
 ffplay -nodisp -probesize 32 -fflags nobuffer -fflags discardcorrupt -flags low_delay -avioflags direct -rtsp_flags listen rtsp://receiver:45678/live.sdp
 ```
 
-### 48kHz 256kbps MPEG-1 Layer 2 (MP2) stereo with RTSP SDP TCP transport
+## 48kHz 256kbps MPEG-1 Layer 2 (MP2) stereo with RTSP SDP TCP transport
 
 * For lower CPU load
 

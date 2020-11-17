@@ -1,20 +1,20 @@
-## gstreamer streaming examples
+# gstreamer streaming examples
 
-### Note
+## Note
 
 * Sender Linux: Raspberry Pi 4B with Raspberry Pi OS
 * Receiver macOS: macOS 10.15.7
 
-### Note for macOS
+## Note for macOS
 
-#### osxaudiosrc and osxaudiosink
+### osxaudiosrc and osxaudiosink
 
 * Use `osxaudiosrc` for OSX device input
 * Use `osxaudiosink` for OSX device output
 * Use as `osxaudiosink device=93`
 * To obtain devices, install [macos-audio-devices](https://github.com/karaggeorge/macos-audio-devices)
 
-### 48kHz Vorbis RTP stream over TCP
+## 48kHz Vorbis RTP stream over TCP
 
 Measured delay: ~0.2sec
 
@@ -28,7 +28,7 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=audio,clock-rate=48000,encoding-name=VORBIS" ! rtpstreamdepay ! rtpvorbisdepay ! decodebin ! audioconvert ! audioresample ! autoaudiosink
 ```
 
-### Opus RTP stream 
+## Opus RTP stream 
 
 Measured delay: ~0.2sec
 
@@ -42,7 +42,7 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 gst-launch-1.0 udpsrc caps="application/x-rtp,channels=1" port=5008 ! rtpjitterbuffer latency=60 ! queue ! rtpopusdepay ! opusdec plc=true ! audioconvert ! audioresample ! autoaudiosink
 ```
 
-### 8kHz ALAW RTP stream over TCP
+## 8kHz ALAW RTP stream over TCP
 
 Measured delay: ~0.1sec or lower
 
@@ -56,11 +56,11 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 gst-launch-1.0 tcpclientsrc port=5678 host=***REMOVED*** do-timestamp=true ! "application/x-rtp-stream,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)PCMA" ! rtpstreamdepay ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
 ```
 
-### 44.1kHz linear PCM RTP stream over TCP
+## 44.1kHz linear PCM RTP stream over TCP
 
 * Measured delay: ~0.1sec or lower
 
-#### Linux -> macOS
+### Linux -> macOS
 
 ```shell
 # server and sender Linux
@@ -72,7 +72,7 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 gst-launch-1.0 tcpclientsrc port=5678 host=***REMOVED*** do-timestamp=true ! "application/x-rtp-stream,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpstreamdepay ! rtpL16depay ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
 ```
 
-#### macOS -> Linux (for the other direction)
+### macOS -> Linux (for the other direction)
 
 ```
 # server and sender macOS
