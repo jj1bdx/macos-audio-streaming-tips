@@ -58,7 +58,9 @@ gst-launch-1.0 tcpclientsrc port=5678 host=***REMOVED*** do-timestamp=true ! "ap
 
 ### 44.1kHz linear PCM RTP stream over TCP
 
-Measured delay: ~0.1sec or lower
+* Measured delay: ~0.1sec or lower
+
+#### Linux -> macOS
 
 ```shell
 # server and sender Linux
@@ -68,4 +70,16 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 ```shell
 # client and receiver macOS
 gst-launch-1.0 tcpclientsrc port=5678 host=***REMOVED*** do-timestamp=true ! "application/x-rtp-stream,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpstreamdepay ! rtpL16depay ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
+```
+
+#### macOS -> Linux (for the other direction)
+
+```
+# server and sender macOS
+gst-launch-1.0 -v osxaudiosrc device=130 provide-clock=true do-timestamp=true buffer-time=100000 ! audioconvert ! rtpL16pay ! rtpstreampay ! tcpserversink port=5678 host=sender
+```
+
+```
+# client and receiver Linux
+gst-launch-1.0 -v tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpstreamdepay ! rtpL16depay ! audioconvert ! audioresample ! alsasink device=plughw:CARD=CODEC,DEV=0
 ```
