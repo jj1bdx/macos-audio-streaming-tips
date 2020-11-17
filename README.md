@@ -10,5 +10,5 @@ Including:
 
 ## LICENSE
 
-* Documents: CC-BY-4.0 (see [LICENSE])
+* Documents: CC-BY-4.0 (see [LICENSE](LICENSE))
 * Code: MIT (See [LICENSE.MIT](LICENSE.MIT))
