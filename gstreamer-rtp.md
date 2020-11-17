@@ -74,6 +74,8 @@ gst-launch-1.0 tcpclientsrc port=5678 host=***REMOVED*** do-timestamp=true ! "ap
 
 ### macOS -> Linux (for the other direction)
 
+Note: monitoring audio for this direction discovered that noticeable clicks (possibly phase disruption) were audible for every one second. (Timestamping issue?)
+
 ```
 # server and sender macOS
 gst-launch-1.0 -v osxaudiosrc device=130 provide-clock=true do-timestamp=true buffer-time=100000 ! audioconvert ! rtpL16pay ! rtpstreampay ! tcpserversink port=5678 host=sender
