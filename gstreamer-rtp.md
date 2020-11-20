@@ -1,6 +1,6 @@
 # gstreamer streaming examples
 
-## Note
+## System configuration
 
 * Sender Linux: Raspberry Pi 4B with Raspberry Pi OS
 * Receiver macOS: macOS 10.15.7
@@ -16,7 +16,7 @@
 
 ## 48kHz Vorbis RTP stream over TCP
 
-Measured delay: ~0.2sec
+* Measured delay: ~0.2sec
 
 ```shell
 # server and sender Linux
@@ -30,7 +30,7 @@ gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "applicati
 
 ## Opus RTP stream 
 
-Measured delay: ~0.2sec
+* Measured delay: ~0.2sec
 
 ```shell
 # sender Linux
@@ -42,9 +42,10 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 gst-launch-1.0 udpsrc caps="application/x-rtp,channels=1" port=5008 ! rtpjitterbuffer latency=60 ! queue ! rtpopusdepay ! opusdec plc=true ! audioconvert ! audioresample ! autoaudiosink
 ```
 
-## 8kHz ALAW RTP stream over TCP
+## 8kHz A-Law RTP stream over TCP
 
-Measured delay: ~0.1sec or lower
+* Measured delay: ~0.1sec or lower
+* Note: using TCP might have caused cumulative latency for long-time streaming (about 2 hours)
 
 ```shell
 # server and sender Linux
@@ -54,6 +55,20 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 ```shell
 # client and receiver macOS
 gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)PCMA" ! rtpstreamdepay ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
+```
+
+## 8kHz A-Law RTP over UDP
+
+* Measured delay: ~0.1sec or lower
+
+```shell
+# server and sender Linux
+gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audioconvert ! alawenc ! rtppcmapay ! udpsink host=receiver port=5008
+```
+
+```shell
+# client and receiver macOS
+gst-launch-1.0 udpsrc caps="application/x-rtp,media=(string)audio,clock-rate=(int)8000,encoding-name=(string)PCMA" port=5008 ! rtpjitterbuffer latency=60 ! queue ! rtppcmadepay ! alawdec ! audioconvert ! audioresample ! osxaudiosink device=62 buffer_time=20000 latency_time=10000
 ```
 
 ## 44.1kHz linear PCM RTP stream over TCP
