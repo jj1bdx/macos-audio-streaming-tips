@@ -101,15 +101,16 @@ gst-launch-1.0 -v osxaudiosrc device=130 provide-clock=true do-timestamp=true bu
 gst-launch-1.0 -v tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpstreamdepay ! rtpL16depay ! audioconvert ! audioresample ! alsasink device=plughw:CARD=CODEC,DEV=0
 ```
 
-## 44.1kHz linear PCM RTP over UDP
+## 48kHz -> 44.1kHz linear PCM RTP over UDP
 
 * Measured delay: ~0.1sec or lower
+* RTP only accepts 44.1kHz S16BE mono or stereo
 
 ### Linux -> macOS
 
 ```shell
 # client and sender macOS
-gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audioconvert ! rtpL16pay ! udpsink host=receiver port=5008
+gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer-time=40000 ! "audio/x-raw,rate=48000" ! audioresample ! "audio/x-raw,rate=44100" ! audioconvert ! rtpL16pay ! udpsink host=receiver port=5008
 ```
 
 ```shell
