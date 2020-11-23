@@ -28,7 +28,7 @@ gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-time
 gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=audio,clock-rate=48000,encoding-name=VORBIS" ! rtpstreamdepay ! rtpvorbisdepay ! decodebin ! audioconvert ! audioresample ! autoaudiosink
 ```
 
-## Opus RTP stream 
+## Opus RTP stream
 
 * Measured delay: ~0.2sec
 
@@ -110,11 +110,41 @@ gst-launch-1.0 -v tcpclientsrc port=5678 host=sender do-timestamp=true ! "applic
 ### Linux -> macOS
 
 ```shell
-# client and sender macOS
+# client and sender Linux
 gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer-time=40000 ! "audio/x-raw,rate=48000" ! audioresample ! "audio/x-raw,rate=44100" ! audioconvert ! rtpL16pay ! udpsink host=receiver port=5008
 ```
 
 ```shell
 # server and receiver macOS
 gst-launch-1.0 udpsrc port=5008 caps="application/x-rtp,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpjitterbuffer latency=30 ! queue ! rtpL16depay ! audioconvert ! audioresample ! osxaudiosink device=62 buffer_time=20000 latency_time=10000
+```
+
+## 44.1kHz linear PCM RTP stream over TCP, Payload Type 11 (monaural)
+
+* Measured delay: ~0.1sec or lower
+* Input sampling rate: 48kHz
+
+```shell
+# server and sender Linux
+gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer-time=40000 ! audioconvert mix-matrix="<<(float)0.5, (float)0.5>>" ! "audio/x-raw,rate=48000,channel=1" ! audioresample ! "audio/x-raw,rate=44100" ! rtpL16pay ! "application/x-rtp, media=audio, encoding-name=L16, payload=11,clock-rate=44100,channels=1" ! rtpstreampay ! tcpserversink port=5678 host=sender
+```
+
+```shell
+# client and receiver macOS
+gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=audio, clock-rate=44100, encoding-name=L16, channels=1, payload=11" ! rtpstreamdepay ! rtpL16depay ! "audio/x-raw,rate=44100,channels=1" ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
+```
+
+## 44.1kHz linear PCM RTP stream over TCP, Payload Type 10 (stereo)
+
+* Measured delay: ~0.1sec or lower
+* Input sampling rate: 48kHz
+
+```shell
+# server and sender Linux
+gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer-time=40000 ! audioconvert ! "audio/x-raw,rate=48000,channel=2" ! audioresample ! "audio/x-raw,rate=44100" ! rtpL16pay ! "application/x-rtp, media=audio, encoding-name=L16, payload=10 ,clock-rate=44100,channels=2" ! rtpstreampay ! tcpserversink port=5678 host=sender
+```
+
+```shell
+# client and receiver macOS
+gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream, media=audio, clock-rate=44100, encoding-name=L16, channels=2, payload=10" ! rtpstreamdepay ! rtpL16depay ! "audio/x-raw,rate=44100, channels=2" ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
 ```
