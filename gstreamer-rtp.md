@@ -74,12 +74,13 @@ gst-launch-1.0 udpsrc caps="application/x-rtp,media=(string)audio,clock-rate=(in
 ## 44.1kHz linear PCM RTP stream over TCP
 
 * Measured delay: ~0.1sec or lower
+* Input sampling rate: 48kHz
 
 ### Linux -> macOS
 
 ```shell
 # server and sender Linux
-gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audioconvert ! audioresample ! "audio/x-raw,rate=44100" ! rtpL16pay ! rtpstreampay ! tcpserversink port=5678 host=sender
+gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audioconvert ! "audio/x-raw,rate=48000" ! audioresample ! "audio/x-raw,rate=44100" ! rtpL16pay ! rtpstreampay ! tcpserversink port=5678 host=sender
 ```
 
 ```shell
