@@ -79,7 +79,7 @@ gst-launch-1.0 udpsrc caps="application/x-rtp,media=(string)audio,clock-rate=(in
 
 ```shell
 # server and sender Linux
-gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audioconvert ! rtpL16pay ! rtpstreampay ! tcpserversink port=5678 host=sender
+gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audioconvert ! audioresample ! "audio/x-raw,rate=44100" ! rtpL16pay ! rtpstreampay ! tcpserversink port=5678 host=sender
 ```
 
 ```shell
