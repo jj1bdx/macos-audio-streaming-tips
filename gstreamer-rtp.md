@@ -20,12 +20,12 @@
 
 ```shell
 # server and sender Linux
-gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! "audio/x-raw,rate=48000" ! vorbisenc ! rtpvorbispay config-interval=1 ! rtpstreampay ! tcpserversink port=5678 host=sender
+gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer-time=60000 ! audioconvert ! queue ! "audio/x-raw,rate=48000,channel=2" ! vorbisenc ! queue ! rtpvorbispay config-interval=1 ! rtpstreampay ! tcpserversink port=5678 host=sender
 ```
 
 ```shell
 # client and receiver macOS
-gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream,media=audio,clock-rate=48000,encoding-name=VORBIS" ! rtpstreamdepay ! rtpvorbisdepay ! decodebin ! audioconvert ! audioresample ! autoaudiosink
+gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream, media=audio, clock-rate=48000, encoding-name=VORBIS" ! rtpstreamdepay ! queue ! rtpvorbisdepay ! queue ! decodebin ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
 ```
 
 ## Opus RTP stream
