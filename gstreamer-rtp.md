@@ -25,7 +25,7 @@ gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer
 
 ```shell
 # client and receiver macOS
-gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream, media=audio, clock-rate=48000, encoding-name=VORBIS" ! rtpstreamdepay ! queue ! rtpvorbisdepay ! queue ! decodebin ! audioconvert ! audioresample ! autoaudiosink buffer_time=20000 latency_time=10000
+gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "application/x-rtp-stream, media=audio, clock-rate=48000, encoding-name=VORBIS" ! rtpstreamdepay ! queue ! rtpvorbisdepay ! queue ! decodebin ! audioconvert ! audioresample ! autoaudiosink buffer_time=50000 latency_time=10000
 ```
 
 ## Opus RTP stream
