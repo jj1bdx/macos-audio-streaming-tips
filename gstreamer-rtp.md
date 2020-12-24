@@ -14,6 +14,20 @@
 * Use as `osxaudiosink device=93`
 * To obtain devices, install [macos-audio-devices](https://github.com/karaggeorge/macos-audio-devices)
 
+## 44.1kHz stereo linear PCM over UDP
+
+* [RTP payload format](https://en.wikipedia.org/wiki/RTP_payload_formats) Type 10
+
+```shell
+# client and sender Linux
+gst-launch-1.0 alsasrc device=hw:4,0 provide-clock=true do-timestamp=true buffer-time=40000 ! "audio/x-raw,rate=44100" ! audioconvert ! rtpL16pay ! "application/x-rtp, media=audio, encoding-name=L16, payload=10 ,clock-rate=44100,channels=2" ! udpsink host=receiver port=5008
+```
+
+```shell
+# server and receiver macOS
+gst-launch-1.0 udpsrc port=5008 caps="application/x-rtp,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)10" ! rtpjitterbuffer latency=30 ! queue ! rtpL16depay ! audioconvert ! osxaudiosink device=44 buffer_time=20000 latency_time=10000
+```
+
 ## 48kHz Vorbis RTP stream over TCP
 
 * Measured delay: ~0.2sec
