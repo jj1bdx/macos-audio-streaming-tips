@@ -120,3 +120,15 @@ gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer
 gst-launch-1.0 udpsrc port=5008 caps="application/x-rtp,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpjitterbuffer latency=30 ! queue ! rtpL16depay ! audioconvert ! audioresample ! osxaudiosink device=62 buffer_time=20000 latency_time=10000
 ```
 
+### Linux -> macOS version 2 (modified)
+
+```shell
+# client and sender Linux
+gst-launch-1.0 alsasrc device=hw:0,1 provide-clock=true do-timestamp=true buffer-time=40000 ! queue ! "audio/x-raw,rate=48000" ! audioresample ! "audio/x-raw,rate=44100" ! audioconvert ! queue ! rtpL16pay ! udpsink host=receiver port=5008
+```
+
+```shell
+# server and receiver macOS
+gst-launch-1.0 udpsrc port=5008 caps="application/x-rtp,media=(string)audio, clock-rate=(int)44100, encoding-name=(string)L16, encoding-params=(string)2, channels=(int)2, payload=(int)96" ! rtpjitterbuffer latency=30 ! queue ! rtpL16depay ! audioconvert ! queue ! audioresample ! osxaudiosink device=77 buffer_time=20000 latency_time=10000
+```
+
