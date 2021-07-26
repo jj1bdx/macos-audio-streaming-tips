@@ -66,12 +66,12 @@ gst-launch-1.0 tcpclientsrc port=5678 host=sender do-timestamp=true ! "applicati
 
 ```shell
 # sender Linux
-gst-launch-1.0 alsasrc device=plughw:CARD=CODEC,DEV=0 provide-clock=true do-timestamp=true buffer-time=20000 ! audio/x-raw,channels=1 ! audiorate ! audioconvert ! opusenc bitrate=256000 frame-size=2.5 ! rtpopuspay ! udpsink host=receiver port=5008
+gst-launch-1.0 alsasrc device=hw:6,0 provide-clock=true do-timestamp=true buffer-time=40000 ! audio/x-raw,channels=1 ! audiorate ! audioconvert ! opusenc bitrate=64000 frame-size=2.5 ! rtpopuspay ! udpsink host=receiver port=5108
 ```
 
 ```shell
 # receiver macOS
-gst-launch-1.0 udpsrc caps="application/x-rtp,channels=1" port=5008 ! rtpjitterbuffer latency=60 ! queue ! rtpopusdepay ! opusdec plc=true ! audioconvert ! audioresample ! autoaudiosink
+gst-launch-1.0 udpsrc port=5108 caps="application/x-rtp,channels=1" ! rtpjitterbuffer latency=60 ! queue ! rtpopusdepay ! queue ! opusdec plc=true ! audioconvert ! audioresample ! osxaudiosink device=66 buffer_time=20000 latency_time=10000
 ```
 
 ## 8kHz A-Law RTP stream over TCP
